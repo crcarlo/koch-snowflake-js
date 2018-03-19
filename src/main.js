@@ -31,7 +31,8 @@ var panel = QuickSettings.create(10, 10 + canvas_top, "Paramethers", null)
 	.addRange("ShiftX", -300, 300, 0, 1, update)
 	.addRange("ShiftY", -300, 300, 0, 1, update)
 	.addRange("Zoom", 0, 2, 1, 0.01, update)
-	.addRange("Edge Thickness", 1, 10, 1, 0.1, draw)
+	.addRange("Edge Thickness", 0, 10, 1, 0.1, draw)
+	.addRange("Dot Thickness", 0, 10, 0, 0.1, draw)
 	.addButton("Info", toggleInfoPanel)
 	.addButton("Color", toggleColorPanel);
 
@@ -185,17 +186,33 @@ function singleIteration(index) {
 
 /**
  * Draws 'points' list as segments
- * vertexDot (boolean) => draw dots on vertex or not
+ * and dots as circles
  */
 function draw() {
 	edgeThickness = panel.getValue("Edge Thickness");
+	dotThickness = panel.getValue("Dot Thickness");
 	context.clearRect(0, 0, width, height);
+	context.strokeStyle = lineColor;
+	context.fillStyle = lineColor;
+	context.lineWidth = edgeThickness;
 	for (var i = 0; i < points.length - 1; i++) {
-		context.strokeStyle = lineColor;
-		context.lineWidth = edgeThickness;
-		context.beginPath();
-		context.moveTo(points[i].x, points[i].y);
-		context.lineTo(points[i + 1].x, points[i + 1].y);
-		context.stroke();
+		if (edgeThickness > 0) {
+			context.beginPath();
+			context.moveTo(points[i].x, points[i].y);
+			context.lineTo(points[i + 1].x, points[i + 1].y);
+			context.stroke();
+		}
+	}
+	for (var i = 0; i < points.length - 1; i++) {
+		if (dotThickness > 0) {
+			if (i === 0) {
+				context.beginPath();
+				context.arc(points[i].x, points[i].y, dotThickness, 0, Math.PI * 2, true);
+				context.fill();
+			}
+			context.beginPath();
+			context.arc(points[i + 1].x, points[i + 1].y, dotThickness, 0, Math.PI * 2, true);
+			context.fill();
+		}
 	}
 }
